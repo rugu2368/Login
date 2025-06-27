@@ -1,0 +1,10 @@
+<nav>
+  <ul>
+    {{#if isLoggedIn}}
+      <li><a href="/auth/user">👤 {{user.email}}</a></li>
+      <li><a href="/auth/logout">Logout</a></li>
+    {{else}}
+      <li><a href="/login">Login</a></li>
+    {{/if}}
+  </ul>
+</nav>

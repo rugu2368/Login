@@ -1,0 +1,119 @@
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f4f4f9;
+            scroll-behavior: smooth;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar .nav-link {
+            color: #f8f9fa;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar .nav-link:hover {
+            color: #0dcaf0;
+        }
+
+        .about-section, .projects-section, .skills-section, .contact-section, .login-section {
+            padding: 80px 20px;
+        }
+
+        .about-section h1, .projects-section h1, .skills-section h1, .contact-section h1, .login-section h1 {
+            font-size: 2.8rem;
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .about-section h1::after, .projects-section h1::after, .skills-section h1::after, .contact-section h1::after, .login-section h1::after {
+            content: '';
+            width: 60px;
+            height: 4px;
+            background: #0dcaf0;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .about-section p {
+            text-align: justify;
+            line-height: 1.8;
+            margin: 20px 0;
+        }
+
+        .projects-section .card {
+            border: none;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .projects-section .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .projects-section .card img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .skills-section .skill {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .skills-section .skill:hover {
+            transform: scale(1.1);
+        }
+
+        .skills-section .skill img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+
+        .skills-section .skill-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .contact-section {
+            background-color: #343a40;
+            color: #f8f9fa;
+            text-align: center;
+        }
+
+        .contact-section .social-icons a {
+            margin: 0 10px;
+            color: #f8f9fa;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .contact-section .social-icons a:hover {
+            color: #0dcaf0;
+        }
+
+        .contact-section .contact-info p {
+            font-size: 1.2rem;
+        }
+
+        .btn-primary {
+            background-color: #0dcaf0;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b8cbf;
+        }

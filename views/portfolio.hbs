@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{title}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/portfolio.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Portfolio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          {{#if isLoggedIn}}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              👤 {{user.username}}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><span class="dropdown-item-text">Email: {{user.email}}</span></li>
+              <li><span class="dropdown-item-text">Employee ID: {{user.employee_id}}</span></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+            </ul>
+          </li>
+          {{else}}
+          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          {{/if}}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- About Section -->
+  <section id="about" class="about-section container py-5">
+    <h1>About Me</h1>
+    <div class="text-center">
+      <img src="/images/profile.jpeg" alt="Profile Photo" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+    </div>
+    <p>I am Gurumoorthy, an aspiring data analyst with an M.Sc. in Bioinformatics. I specialize in data visualization, statistical analysis, and using tools such as Python, SQL, Excel, Tableau, and Power BI to extract actionable insights.</p>
+    <p>My projects range from e-commerce analysis to interactive dashboard development, with a focus on solving real-world data problems efficiently.</p>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="projects-section container py-5">
+    <h1>Projects</h1>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card">
+          <img src="/images/project1.png" class="card-img-top" alt="E-commerce Sales">
+          <div class="card-body">
+            <h5 class="card-title">E-commerce Sales Analysis</h5>
+            <p class="card-text">Trend identification and interactive dashboards built from sales data.</p>
+            <a href="https://github.com/rugu2368/E-commerce-Sales-Analysis.git" class="btn btn-primary">View Project</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <img src="/images/project2.png" class="card-img-top" alt="Website Analytics">
+          <div class="card-body">
+            <h5 class="card-title">Website Analytics</h5>
+            <p class="card-text">Used SQL for user behavior analysis to improve performance.</p>
+            <a href="https://github.com/rugu2368/Website-Analysis.git" class="btn btn-primary">View Project</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <img src="/images/project3.png" class="card-img-top" alt="Tableau Dashboards">
+          <div class="card-body">
+            <h5 class="card-title">Tableau Dashboards</h5>
+            <p class="card-text">Created dashboards for shipping metrics and stock insights.</p>
+            <a href="https://github.com/rugu2368/Empowering-Business-Insights-with-Interactive-Tableau-Dashboards.git" class="btn btn-primary">View Project</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills" class="skills-section container py-5">
+    <h1>Skills</h1>
+    <div class="row text-center">
+      <div class="col-md-2"><img src="/images/python.jpeg" alt="Python" class="img-fluid"><p>Python</p></div>
+      <div class="col-md-2"><img src="/images/sql.jpeg" alt="SQL" class="img-fluid"><p>SQL</p></div>
+      <div class="col-md-2"><img src="/images/tableau.jpeg" alt="Tableau" class="img-fluid"><p>Tableau</p></div>
+      <div class="col-md-2"><img src="/images/xcel.jpeg" alt="Excel" class="img-fluid"><p>Excel</p></div>
+      <div class="col-md-2"><img src="/images/power-BI.jpg" alt="Power BI" class="img-fluid"><p>Power BI</p></div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact-section bg-dark text-white py-5">
+    <div class="container text-center">
+      <h1>Contact Me</h1>
+      <p>Email: <a href="mailto:guruganesh005@gmail.com" class="text-info">guruganesh005@gmail.com</a></p>
+      <p>Phone: +91 638569999 52120</p>
+      <div class="social-icons">
+        <a href="https://www.linkedin.com/in/gurumoorthy-c2002" target="_blank" class="text-white mx-2"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/rugu2368" target="_blank" class="text-white mx-2"><i class="fab fa-github"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
