@@ -1,7 +1,14 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Login and Approval System with Express and MySQL",
+  "main": "ex.js",
+  "scripts": {
+    "start": "node ex.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -11,18 +18,12 @@
     "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
-    "nodemailer": "^7.0.3",
-    "npm": "^10.9.2"
+    "nodemailer": "^7.0.3"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ex.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "nodemon": "^3.1.10"
   },
-  "description": ""
+  "engines": {
+    "node": ">=18"
+  }
 }
