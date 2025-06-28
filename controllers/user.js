@@ -1,8 +1,9 @@
+// controllers/user.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const db = require('../db'); // Adjust this path if your db is set up differently
+const db = require('../db');
 require('dotenv').config();
 
 // Mail setup
@@ -14,8 +15,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Helper to create JWT
-const createToken = (user) => {
+// Helper to create JWT\const createToken = (user) => {
   return jwt.sign(user, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -95,8 +95,9 @@ exports.register = async (req, res) => {
           });
         }
 
-        const approveLink = `http://localhost:5000/auth/approve?id=${result2.insertId}&token=${token}`;
-        const rejectLink = `http://localhost:5000/auth/reject?id=${result2.insertId}&token=${token}`;
+        const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+        const approveLink = `${baseUrl}/auth/approve?id=${result2.insertId}&token=${token}`;
+        const rejectLink = `${baseUrl}/auth/reject?id=${result2.insertId}&token=${token}`;
 
         await transporter.sendMail({
           from: process.env.ADMIN_EMAIL,
