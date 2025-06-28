@@ -4,7 +4,7 @@
   "description": "Login and Approval System with Express and MySQL",
   "main": "ex.js",
   "scripts": {
-    "start": "node ex.js"
+    "start": "npm start"
   },
   "keywords": [],
   "author": "",
