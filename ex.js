@@ -1,4 +1,3 @@
-// ========== ex.js ==========
 const express = require('express');
 const mysql = require('mysql');
 const dotenv = require('dotenv');
@@ -14,6 +13,7 @@ dotenv.config({ path: './.env' });
 
 const app = express();
 
+// MySQL connection
 const db = mysql.createConnection({
   host: process.env.database_host,
   user: process.env.database_user,
@@ -22,8 +22,8 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-  if (err) console.error('DB Error:', err);
-  else console.log('Database connected');
+  if (err) console.error('❌ DB Connection Error:', err);
+  else console.log('✅ Database connected');
 });
 
 app.use(cookieParser());
@@ -34,6 +34,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
 
+// Auth Middleware
 const checkAuth = (req, res, next) => {
   const token = req.cookies.guru;
   if (!token) {
@@ -51,7 +52,7 @@ const checkAuth = (req, res, next) => {
 };
 app.use(checkAuth);
 
-// Mail transporter for admin notification
+// Nodemailer transporter
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -114,7 +115,7 @@ app.post('/auth/login', async (req, res) => {
 
   db.query("SELECT * FROM users_id WHERE Email = ?", [email], async (err, result) => {
     if (err) {
-      console.error("Login error:", err);
+      console.error("❌ Login error:", err.message);
       return res.status(500).render('login', {
         loginError: 'Server error', layout: 'main'
       });
@@ -138,6 +139,7 @@ app.post('/auth/login', async (req, res) => {
       username: result[0].username || result[0].Email.split('@')[0],
       employee_id: result[0].employee_id || result[0].id
     };
+
     const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN
     });
@@ -161,7 +163,7 @@ app.post('/auth/register', async (req, res) => {
 
   db.query("SELECT Email FROM users_id WHERE Email = ?", [email], async (err, result) => {
     if (err) {
-      console.error("Email check error:", err);
+      console.error("❌ MySQL email check error:", err.message);
       return res.status(500).render('login', {
         signupError: 'Server error while checking email', layout: 'main'
       });
@@ -180,14 +182,16 @@ app.post('/auth/register', async (req, res) => {
       [email, hashedPassword, token],
       async (err2, result2) => {
         if (err2) {
-          console.error("Insert error:", err2);
+          console.error("❌ Insert error:", err2.message);
           return res.status(500).render('login', {
             signupError: 'Registration failed', layout: 'main'
           });
         }
 
-        const approveLink = `http://localhost:5000/auth/approve?id=${result2.insertId}&token=${token}`;
-        const rejectLink = `http://localhost:5000/auth/reject?id=${result2.insertId}&token=${token}`;
+        // Use BASE_URL from .env or fallback to Render site URL
+        const baseUrl = process.env.BASE_URL || `https://${process.env.RENDER_EXTERNAL_URL}`;
+        const approveLink = `${baseUrl}/auth/approve?id=${result2.insertId}&token=${token}`;
+        const rejectLink = `${baseUrl}/auth/reject?id=${result2.insertId}&token=${token}`;
 
         await transporter.sendMail({
           from: process.env.ADMIN_EMAIL,
@@ -232,7 +236,8 @@ app.get('/auth/reject', (req, res) => {
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
