@@ -1,4 +1,3 @@
-// controllers/user.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -6,7 +5,6 @@ const crypto = require('crypto');
 const db = require('../db');
 require('dotenv').config();
 
-// Mail setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -15,7 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Helper to create JWT\const createToken = (user) => {
+const createToken = (user) => {
   return jwt.sign(user, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -31,7 +29,15 @@ exports.login = async (req, res) => {
   }
 
   db.query('SELECT * FROM users_id WHERE Email = ?', [email], async (err, result) => {
-    if (err || result.length === 0 || !(await bcrypt.compare(password, result[0].pass))) {
+    if (err) {
+      console.error("❌ DB Error:", err);
+      return res.status(500).render('login', {
+        loginError: 'Server error',
+        layout: 'main',
+      });
+    }
+
+    if (result.length === 0 || !(await bcrypt.compare(password, result[0].pass))) {
       return res.status(401).render('login', {
         loginError: 'Invalid email or password',
         layout: 'main',
@@ -74,9 +80,17 @@ exports.register = async (req, res) => {
   }
 
   db.query('SELECT Email FROM users_id WHERE Email = ?', [email], async (err, result) => {
-    if (err || result.length > 0) {
+    if (err) {
+      console.error("❌ MySQL error during email check:", err);
+      return res.status(500).render('login', {
+        signupError: 'Server error. Please try again.',
+        layout: 'main',
+      });
+    }
+
+    if (result.length > 0) {
       return res.status(400).render('login', {
-        signupError: 'Email already exists or server error',
+        signupError: 'Email already exists',
         layout: 'main',
       });
     }
@@ -142,13 +156,33 @@ exports.getUserPage = (req, res) => {
 
 exports.approveUser = (req, res) => {
   const { id, token } = req.query;
+  console.log("Approval Query Params:", req.query);
+
+  if (!id || !token) {
+    return res.send('❌ Missing approval details.');
+  }
+
   db.query('SELECT * FROM users_id WHERE id = ? AND approval_token = ?', [id, token], (err, results) => {
-    if (err || results.length === 0) {
+    if (err) {
+      console.error("❌ DB Error:", err);
+      return res.send('⚠️ Server error.');
+    }
+
+    if (results.length === 0) {
       return res.send('❌ Invalid or expired token.');
     }
 
-    db.query('UPDATE users_id SET approved = 1, approval_token = NULL WHERE id = ?', [id], (err2) => {
-      if (err2) return res.send('⚠️ Error approving user.');
+    db.query('UPDATE users_id SET approved = 1, approval_token = NULL WHERE id = ? AND approval_token = ?', [id, token], (err2, result) => {
+      if (err2) {
+        console.error("❌ Update Error:", err2);
+        return res.send('⚠️ Error approving user.');
+      }
+
+      if (result.affectedRows === 0) {
+        return res.send('⚠️ No user updated.');
+      }
+
+      console.log(`✅ Approved user with ID: ${id}`);
       res.send('✅ User approved successfully.');
     });
   });
@@ -161,7 +195,7 @@ exports.rejectUser = (req, res) => {
       return res.send('❌ Invalid or expired token.');
     }
 
-    db.query('DELETE FROM users_id WHERE id = ?', [id], (err2) => {
+    db.query('DELETE FROM users_id WHERE id = ? AND approval_token = ?', [id, token], (err2) => {
       if (err2) return res.send('⚠️ Error rejecting user.');
       res.send('❌ User rejected and deleted.');
     });
