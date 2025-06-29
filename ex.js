@@ -13,7 +13,7 @@ dotenv.config({ path: './.env' });
 
 const app = express();
 
-// MySQL DB connection
+// DB Connection
 const db = mysql.createConnection({
   host: process.env.database_host,
   user: process.env.database_user,
@@ -22,10 +22,11 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-  if (err) console.error('❌ DB Error:', err.message);
+  if (err) console.error('❌ DB Connection Error:', err);
   else console.log('✅ Database connected');
 });
 
+// Middlewares
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -34,7 +35,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(path.join(__dirname, 'views/partials'));
 
-// Auth middleware
+// Auth check
 const checkAuth = (req, res, next) => {
   const token = req.cookies.guru;
   if (!token) {
@@ -52,7 +53,7 @@ const checkAuth = (req, res, next) => {
 };
 app.use(checkAuth);
 
-// Nodemailer setup
+// Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -61,7 +62,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Routes
+// Pages
 app.get('/', (req, res) => res.redirect('/dashboard'));
 
 app.get('/dashboard', (req, res) => {
@@ -69,7 +70,7 @@ app.get('/dashboard', (req, res) => {
     layout: 'dashlayout',
     title: 'Dashboard',
     isLoggedIn: res.locals.isLoggedIn,
-    user: res.locals.user || null
+    user: res.locals.user || null,
   });
 });
 
@@ -83,7 +84,7 @@ app.get('/portfolio', (req, res) => {
     layout: 'portfoliolayout',
     title: 'My Portfolio',
     isLoggedIn: true,
-    user: res.locals.user
+    user: res.locals.user,
   });
 });
 
@@ -95,7 +96,7 @@ app.get('/auth/user', (req, res) => {
     email: res.locals.user.email,
     id: res.locals.user.id,
     username: res.locals.user.username,
-    employee_id: res.locals.user.employee_id
+    employee_id: res.locals.user.employee_id,
   });
 });
 
@@ -104,7 +105,7 @@ app.get('/auth/logout', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Login
+// POST: Login
 app.post('/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -115,9 +116,9 @@ app.post('/auth/login', async (req, res) => {
 
   db.query("SELECT * FROM users_id WHERE Email = ?", [email], async (err, result) => {
     if (err) {
-      console.error("❌ Login DB error:", err.message);
+      console.error("❌ Login error:", err.message);
       return res.status(500).render('login', {
-        loginError: 'Server error during login', layout: 'main'
+        loginError: 'Server error', layout: 'main'
       });
     }
 
@@ -139,6 +140,7 @@ app.post('/auth/login', async (req, res) => {
       username: result[0].username || result[0].Email.split('@')[0],
       employee_id: result[0].employee_id || result[0].id
     };
+
     const token = jwt.sign(userPayload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN
     });
@@ -151,7 +153,7 @@ app.post('/auth/login', async (req, res) => {
   });
 });
 
-// Register
+// POST: Register
 app.post('/auth/register', async (req, res) => {
   const { email, password, confirm_password } = req.body;
   if (!email || !password || password !== confirm_password) {
@@ -187,7 +189,7 @@ app.post('/auth/register', async (req, res) => {
           });
         }
 
-        const baseUrl = process.env.BASE_URL || `http://${req.headers.host}`;
+        const baseUrl = process.env.BASE_URL || `https://${process.env.RENDER_EXTERNAL_URL}`;
         const approveLink = `${baseUrl}/auth/approve?id=${result2.insertId}&token=${token}`;
         const rejectLink = `${baseUrl}/auth/reject?id=${result2.insertId}&token=${token}`;
 
@@ -206,21 +208,29 @@ app.post('/auth/register', async (req, res) => {
   });
 });
 
-// Approve
+// GET: Approve
 app.get('/auth/approve', (req, res) => {
   const { id, token } = req.query;
+  console.log("🧪 Approve link hit:", id, token);
+
   db.query("SELECT * FROM users_id WHERE id = ? AND approval_token = ?", [id, token], (err, results) => {
     if (err || results.length === 0) {
+      console.error("❌ Approve select error:", err);
       return res.send("❌ Invalid or expired token.");
     }
+
     db.query("UPDATE users_id SET approved = 1, approval_token = NULL WHERE id = ?", [id], (err2) => {
-      if (err2) return res.send("⚠️ Error approving user.");
+      if (err2) {
+        console.error("❌ Approve update error:", err2);
+        return res.send("⚠️ Error approving user.");
+      }
+
       res.send("✅ User approved successfully.");
     });
   });
 });
 
-// Reject
+// GET: Reject
 app.get('/auth/reject', (req, res) => {
   const { id, token } = req.query;
   db.query("SELECT * FROM users_id WHERE id = ? AND approval_token = ?", [id, token], (err, results) => {
@@ -236,6 +246,11 @@ app.get('/auth/reject', (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+
+
+
